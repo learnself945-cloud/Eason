@@ -2,177 +2,302 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小超人成長大冒險 - 穩定版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>小超人成長大冒險 v36-Ultimate</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
-        :root { --primary: #6c5ce7; --secondary: #ff7675; --success: #00b894; --gold: #feca57; --bg: #fdfcf0; }
-        body { font-family: "Microsoft JhengHei", sans-serif; background-color: var(--bg); margin: 0; padding: 15px; display: flex; justify-content: center; }
-        .app-card { width: 100%; max-width: 600px; background: white; border-radius: 30px; box-shadow: 0 15px 35px rgba(108,92,231,0.15); padding: 25px; }
+        :root { 
+            --primary: #b08968; --secondary: #e6ccb2; --accent: #7f5539; 
+            --bg: #f5ebe0; --card: #ffffff; --success: #9c6644; 
+            --gold: #ddb892; --text: #432818;
+        }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; }
+        .app-card { width: 100%; max-width: 600px; background: var(--card); border-radius: 35px; box-shadow: 0 10px 30px rgba(67,40,24,0.08); padding: 25px; min-height: 92vh; }
         
-        .main-score { background: linear-gradient(135deg, var(--primary), #a29bfe); color: white; padding: 20px; border-radius: 25px; text-align: center; margin-bottom: 20px; border: 4px solid #eee; }
-        .main-score span { font-size: 3.2em; font-weight: bold; display: block; }
+        .main-score { background: linear-gradient(135deg, var(--accent), var(--primary)); color: #fff; padding: 25px; border-radius: 28px; text-align: center; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(127,85,57,0.2); }
+        .main-score span { font-size: 3.5em; font-weight: 800; display: block; margin-top: 5px; }
+        
+        .day-label { font-size: 1.1em; font-weight: bold; color: var(--accent); margin-bottom: 10px; display: block; text-align: center; background: #ede0d4; padding: 5px; border-radius: 10px; }
 
-        .quick-add { background: #f8f9fa; padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #eee; }
+        .quick-add { background: #faf3e0; padding: 18px; border-radius: 22px; margin-bottom: 20px; border: 1px solid #ede0d4; }
         .input-row { display: flex; gap: 8px; margin-bottom: 10px; }
-        select, input { padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 16px; outline: none; }
-        select { flex: 2; background: white; }
-        .add-btn { background: var(--primary); color: white; border: none; padding: 0 20px; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        select, input { padding: 12px; border: 1.5px solid #ede0d4; border-radius: 14px; font-size: 16px; outline: none; background: white; color: var(--text); }
+        .add-btn { background: var(--accent); color: white; border: none; padding: 0 20px; border-radius: 14px; font-weight: bold; cursor: pointer; }
 
-        .habit-item { display: flex; justify-content: space-between; align-items: center; padding: 15px 5px; border-bottom: 1px dashed #eee; }
-        .btn-done { background: var(--success); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 0 #008a6f; }
-        .btn-done:active { transform: translateY(2px); box-shadow: none; }
+        .habit-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 10px; border-bottom: 1px solid #fcf2e8; }
+        .habit-info { display: flex; align-items: center; gap: 12px; flex: 1; }
+        .habit-checkbox { width: 24px; height: 24px; accent-color: var(--accent); cursor: pointer; }
+        .habit-name { font-size: 1.1em; font-weight: 600; color: var(--accent); cursor: pointer; text-decoration: underline dotted #d5bdaf; }
+        .habit-name.checked { color: #bb9457; text-decoration: line-through; opacity: 0.6; }
 
-        .report-section { margin-top: 30px; background: #fff; padding: 15px; border-radius: 20px; border: 2px solid #f0f0ff; overflow-x: auto; }
-        .report-table { width: 100%; border-collapse: collapse; font-size: 0.8em; text-align: center; min-width: 450px; }
-        .report-table th, .report-table td { padding: 10px 5px; border: 1px solid #f0f0ff; }
-        .today-col { background-color: #fffde7; }
+        .btn-done { background: var(--success); color: white; border: none; padding: 10px 18px; border-radius: 25px; font-weight: bold; box-shadow: 0 4px 0 #7f5539; cursor: pointer; }
+        .btn-action { flex: 1; padding: 15px; border: none; border-radius: 16px; font-weight: bold; cursor: pointer; font-size: 1em; }
+        .btn-undo { background: #ede0d4; color: var(--accent); }
+        .btn-redeem { background: var(--gold); color: #432818; }
+        .btn-sync { background: var(--primary); color: white; width: 100%; margin-bottom: 15px; height: 50px; border: none; border-radius: 16px; font-weight: bold; cursor: pointer; }
 
-        .admin-panel { display: none; background: #fafafa; padding: 15px; border-radius: 15px; margin-top: 10px; border: 1px solid #eee; }
-        .bank-item { display: flex; justify-content: space-between; font-size: 0.85em; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+        .report-section { margin-top: 25px; background: #fff; padding: 10px; border-radius: 22px; border: 1.5px solid #ede0d4; overflow-x: auto; }
+        .report-table { width: 100%; border-collapse: collapse; font-size: 0.85em; text-align: center; min-width: 450px; }
+        .report-table th { padding: 10px; color: var(--primary); border-bottom: 2px solid #f0ead2; }
+        .star-cell { cursor: pointer; color: var(--accent); font-weight: bold; }
+
+        .admin-panel { display: none; background: #fdfaf7; padding: 20px; border-radius: 20px; margin-top: 15px; border: 1px solid #ede0d4; }
+        .bank-item { padding: 12px 0; border-bottom: 1.5px solid #ede0d4; }
+        .bank-header { display: flex; justify-content: space-between; align-items: center; }
+        .emoji-box { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; justify-content: center; background: white; padding: 10px; border-radius: 15px; border: 1px solid #ede0d4; }
+        .emoji-item { font-size: 1.5rem; cursor: pointer; padding: 5px; }
+        .day-check-group { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+        .day-check-group label { font-size: 0.7em; background: #fff; padding: 3px 6px; border-radius: 6px; border: 1px solid #ede0d4; cursor: pointer; }
+        .btn-sm { font-size: 0.75em; padding: 5px 8px; border-radius: 8px; border: 1px solid #ede0d4; background: white; cursor: pointer; color: var(--accent); margin-left: 4px; }
     </style>
 </head>
 <body>
 
 <div class="app-card">
     <div class="main-score">
-        <div>✨ 目前星星財富 ✨</div>
+        <div>COIN WALLET</div>
         <span id="totalWallet">0</span>
     </div>
 
+    <div class="day-label" id="todayLabel"></div>
+
     <div class="quick-add">
-        <h4 style="margin:0 0 10px 0; color:#666;">📝 新增今日任務</h4>
         <div class="input-row">
-            <select id="habitBankSelect" onchange="syncPoints()">
-                <option value="">-- 選擇常用任務 --</option>
-            </select>
-            <input type="number" id="pointInput" placeholder="分" style="width: 60px;">
-            <button class="add-btn" onclick="addHabitFromSelect()">新增</button>
+            <select id="habitBankSelect" onchange="syncPoints()"></select>
+            <input type="number" id="pointInput" placeholder="分" style="width: 65px;">
+            <button class="add-btn" onclick="addHabitFromSelect()">＋</button>
         </div>
-        <div style="font-size: 0.75em; color: #888;">選取上方清單，或在下方「管理」中新增常駐選項。</div>
     </div>
 
     <div id="habitList"></div>
 
-    <div style="display:flex; gap:10px; margin-top:20px;">
-        <button onclick="undoLastAction()" style="flex:1; padding:12px; border:none; background:#eee; border-radius:12px; cursor:pointer;">↩️ 撤銷</button>
-        <button onclick="redeemPoints()" style="flex:1; padding:12px; border:none; background:var(--gold); border-radius:12px; cursor:pointer; font-weight:bold;">🎁 兌換</button>
+    <div style="display:flex; gap:12px; margin-top:20px;">
+        <button onclick="undoLastAction()" class="btn-action btn-undo">↩ 撤銷加分</button>
+        <button onclick="redeemPoints()" class="btn-action btn-redeem">🎁 兌換獎勵</button>
     </div>
 
     <div class="report-section">
-        <h3 style="margin:0 0 10px 0; font-size:1em; text-align:center;">🏆 本週成就地圖</h3>
         <table class="report-table">
-            <thead>
-                <tr><th>任務</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th><th>日</th></tr>
-            </thead>
+            <thead><tr><th>TASK</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th><th>日</th></tr></thead>
             <tbody id="reportContent"></tbody>
         </table>
     </div>
 
-    <div style="margin-top:40px; text-align:center;">
-        <div onclick="toggleAdmin()" style="color:#ccc; font-size:0.8em; text-decoration:underline; cursor:pointer;">⚙️ 家長管理設定箱</div>
+    <div style="margin-top:30px; text-align:center; padding-bottom: 20px;">
+        <div onclick="toggleAdmin()" style="color:#b08968; font-size:0.85em; text-decoration:underline; cursor:pointer;">⚙️ SETTINGS (設定與圖庫)</div>
         <div id="adminPanel" class="admin-panel">
-            <h4 style="margin:0 0 10px 0;">🏦 常用任務銀行 (記憶清單)</h4>
+            <button class="btn-sync" onclick="syncTodayWithBank()">🔄 依照排程更新今日清單</button>
+            
+            <h4 style="margin: 10px 0; color:var(--accent);">圖庫選擇</h4>
+            <div class="emoji-box" id="emojiPicker"></div>
+
             <div class="input-row">
-                <input type="text" id="newBankName" placeholder="任務名" style="flex:2">
-                <input type="number" id="newBankPoints" placeholder="分" style="width:50px">
-                <button onclick="addToBank()" style="background:var(--success); color:white; border:none; padding:10px; border-radius:10px;">存入</button>
+                <input type="text" id="newBankName" placeholder="選圖標或輸名稱" style="flex:2">
+                <input type="number" id="newBankPoints" placeholder="分" style="width:55px">
+                <button onclick="addToBank()" style="background:var(--success); color:white; border:none; border-radius:12px; padding:0 15px;">儲存</button>
             </div>
-            <div id="bankList" style="text-align:left; max-height:150px; overflow-y:auto;"></div>
-            <hr style="margin:15px 0; border:0; border-top:1px solid #eee;">
-            <button onclick="resetWeeklyOnly()" style="width:100%; padding:10px; color:#ff7675; border:1px solid #ff7675; background:none; border-radius:10px; margin-bottom:5px;">⚠️ 僅重設本週數據</button>
-            <button onclick="fullReset()" style="width:100%; padding:10px; color:#999; border:1px solid #ddd; background:none; border-radius:10px;">🔥 徹底清空系統</button>
+
+            <h4 style="margin: 20px 0 10px; color:var(--accent);">任務銀行 (排程設定)</h4>
+            <div id="bankList" style="text-align:left; max-height:300px; overflow-y:auto; margin-bottom:15px; padding-right:5px;"></div>
+            
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <button class="btn-sm" style="flex:1" onclick="exportData()">📤 備份</button>
+                <button class="btn-sm" style="flex:1" onclick="importData()">📥 還原</button>
+            </div>
+            <button onclick="fullReset()" style="width:100%; margin-top:20px; color:#ccc; border:none; background:none; font-size:0.7em;">🔥 徹底重設系統</button>
         </div>
     </div>
 </div>
 
 <script>
-    // 音效
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    function playSound(f1, f2) {
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.frequency.setValueAtTime(f1, now);
-        osc.frequency.exponentialRampToValueAtTime(f2, now + 0.1);
-        gain.gain.setValueAtTime(0.2, now);
-        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-        osc.start(); osc.stop(now + 0.2);
-    }
+    // 使用固定的 Key 確保不同版本的代碼可以共用同一筆資料
+    const DB_KEY = 'heroApp_Global_Storage';
+    const dayNames = ["日", "一", "二", "三", "四", "五", "六"];
+    const emojis = ["🧠", "📖", "🧹", "📝", "💻", "🎹", "🏀", "🎨", "🧪", "🚿", "🏃", "🛌", "🍎", "🧸", "🌟", "✨"];
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todayDayIdx = (new Date().getDay() + 6) % 7; 
 
-    // 初始化資料 (使用新版本 key 避免舊資料干擾)
-    let habitBank = JSON.parse(localStorage.getItem('heroBank_v9')) || [
-        {name: "📚 閱讀20分鐘", points: 10},
-        {name: "🦷 乖乖刷牙", points: 5}
+    const defaultBank = [
+        {n: "🧠 奧數", p: 20, days:[0,1,2,3,4,5,6]},
+        {n: "📖 英文雜誌", p: 15, days:[0,1,2,3,4,5,6]},
+        {n: "🧹 家事", p: 10, days:[0,1,2,3,4,5,6]},
+        {n: "📝 英文作業", p: 10, days:[0,1,2,3,4,5,6]},
+        {n: "💻 線上作業", p: 10, days:[0,1,2,3,4,5,6]}
     ];
-    let habits = JSON.parse(localStorage.getItem('heroHabits_v9')) || [];
-    let stats = JSON.parse(localStorage.getItem('heroStats_v9')) || { totalWallet: 0, weekStars: 0, weekCount: 0, lastPoints: 0, lastHabitName: "" };
-    let logs = JSON.parse(localStorage.getItem('heroLogs_v9')) || {};
 
-    function save() {
-        localStorage.setItem('heroBank_v9', JSON.stringify(habitBank));
-        localStorage.setItem('heroHabits_v9', JSON.stringify(habits));
-        localStorage.setItem('heroStats_v9', JSON.stringify(stats));
-        localStorage.setItem('heroLogs_v9', JSON.stringify(logs));
+    // 優先讀取舊資料，若無則使用預設
+    let appData = JSON.parse(localStorage.getItem(DB_KEY)) || { 
+        b: defaultBank, h: {}, s: { w: 0, lp: 0, ln: "", ld: "" }, l: {} 
+    };
+
+    function save() { localStorage.setItem(DB_KEY, JSON.stringify(appData)); }
+
+    function initDayTasks() {
+        if (!appData.h[todayStr]) {
+            appData.h[todayStr] = appData.b
+                .filter(item => item.days && item.days.includes(todayDayIdx))
+                .map(item => ({ n: item.n, p: item.p, c: false }));
+            save();
+        }
     }
 
-    // 下拉選單連動分數
-    function syncPoints() {
-        const val = document.getElementById('habitBankSelect').value;
-        const task = habitBank.find(h => h.name === val);
-        if (task) document.getElementById('pointInput').value = task.points;
+    function syncTodayWithBank() {
+        if (!appData.h[todayStr]) appData.h[todayStr] = [];
+        let addedCount = 0;
+        appData.b.forEach(bankItem => {
+            if (bankItem.days.includes(todayDayIdx)) {
+                // 比對名稱（排除點數部分）
+                if (!appData.h[todayStr].some(t => t.n === bankItem.n)) {
+                    appData.h[todayStr].push({ n: bankItem.n, p: bankItem.p, c: false });
+                    addedCount++;
+                }
+            }
+        });
+        save(); updateDisplay();
+        alert(addedCount > 0 ? `已更新 ${addedCount} 項任務！` : "今日清單已是最新狀態。");
     }
 
-    // 將常用任務新增到「今日清單」
-    function addHabitFromSelect() {
-        const name = document.getElementById('habitBankSelect').value;
-        const points = parseInt(document.getElementById('pointInput').value);
-        if (!name) { alert("請先選擇一個任務！"); return; }
+    function updateDisplay() {
+        document.getElementById('totalWallet').innerText = appData.s.w;
+        document.getElementById('todayLabel').innerText = `今天是星期${dayNames[new Date().getDay()]}`;
         
-        // 允許重複新增，或者檢查是否已在清單
-        if (habits.some(h => h.name === name)) {
-            alert("這個任務已經在今日清單中了！");
-        } else {
-            habits.push({ name, points });
-            save();
-            updateDisplay();
-        }
+        document.getElementById('habitBankSelect').innerHTML = '<option value="">-- 快速加入 --</option>' + 
+            appData.b.map(x => `<option value="${x.n}">${x.n}</option>`).join('');
+
+        const tasks = appData.h[todayStr] || [];
+        document.getElementById('habitList').innerHTML = tasks.map((x, i) => `
+            <div class="habit-item">
+                <div class="habit-info">
+                    <input type="checkbox" class="habit-checkbox" ${x.c ? 'checked' : ''} onchange="toggleCheck(${i})">
+                    <span class="habit-name ${x.c ? 'checked' : ''}" onclick="editHabitName(${i})">${x.n}${x.p > 0 ? ` (+${x.p})` : ''}</span>
+                </div>
+                <button class="btn-done" style="display: ${x.c ? 'block' : 'none'}" onclick="completeHabit(${i})">完成領星</button>
+                <span onclick="removeHabit(${i})" style="color:#d5bdaf; padding-left:12px; cursor:pointer; font-size:1.5em; display:${x.c?'none':'block'}">×</span>
+            </div>`).join('');
+
+        const weekDays = getCurrWeekDays();
+        const allTaskNames = [...new Set(Object.values(appData.h).flat().map(t => t.n))];
+        document.getElementById('reportContent').innerHTML = allTaskNames.map(name => `
+            <tr><td style="font-weight:600; color:#7f5539">${name}</td>
+            ${weekDays.map(d => `<td class="star-cell" onclick="fixStar('${d}', '${name}')">${(appData.l[d] && appData.l[d][name]) ? '⭐<br>('+appData.l[d][name]+')' : '-'}</td>`).join('')}
+            </tr>`).join('');
+
+        document.getElementById('bankList').innerHTML = appData.b.map((x, i) => `
+            <div class="bank-item">
+                <div class="bank-header">
+                    <span style="font-weight:600">${x.n} (${x.p}分)</span>
+                    <div>
+                        <button class="btn-sm" onclick="editBank(${i})">編</button>
+                        <button class="btn-sm" style="color:#9c6644" onclick="removeFromBank(${i})">x</button>
+                    </div>
+                </div>
+                <div class="day-check-group">
+                    ${[1,2,3,4,5,6,0].map((d, di) => {
+                        const actualIdx = (d + 6) % 7;
+                        return `<label><input type="checkbox" ${x.days.includes(actualIdx)?'checked':''} onchange="toggleBankDay(${i}, ${actualIdx})">${dayNames[d]}</label>`;
+                    }).join('')}
+                </div>
+            </div>`).join('');
+
+        document.getElementById('emojiPicker').innerHTML = emojis.map(e => `
+            <span class="emoji-item" onclick="document.getElementById('newBankName').value='${e} '+document.getElementById('newBankName').value">${e}</span>
+        `).join('');
     }
 
-    // 新增到常用銀行
-    function addToBank() {
-        const name = document.getElementById('newBankName').value;
-        const points = parseInt(document.getElementById('newBankPoints').value) || 5;
-        if (name) {
-            habitBank.push({ name, points });
-            document.getElementById('newBankName').value = '';
-            document.getElementById('newBankPoints').value = '';
-            save();
-            updateDisplay();
-        }
+    function editHabitName(i) {
+        const newName = prompt("編輯今日任務名稱：", appData.h[todayStr][i].n);
+        if (newName) { appData.h[todayStr][i].n = newName; save(); updateDisplay(); }
     }
 
-    // 打卡完成
+    function toggleCheck(i) { appData.h[todayStr][i].c = !appData.h[todayStr][i].c; save(); updateDisplay(); }
+
     function completeHabit(i) {
-        const h = habits[i];
-        const today = new Date().toISOString().split('T')[0];
-        stats.totalWallet += h.points;
-        stats.weekStars += h.points;
-        stats.weekCount += 1;
-        stats.lastPoints = h.points;
-        stats.lastHabitName = h.name;
-
-        if (!logs[today]) logs[today] = {};
-        logs[today][h.name] = (logs[today][h.name] || 0) + 1;
-
-        playSound(523, 1046);
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-        save();
-        updateDisplay();
+        const x = appData.h[todayStr][i];
+        appData.s.w += x.p; appData.s.lp = x.p; appData.s.ln = x.n; appData.s.ld = todayStr;
+        if (!appData.l[todayStr]) appData.l[todayStr] = {};
+        appData.l[todayStr][x.n] = (appData.l[todayStr][x.n] || 0) + 1;
+        appData.h[todayStr][i].c = false;
+        confetti({ particleCount: 150, spread: 70, colors: ['#ddb892', '#b08968', '#7f5539', '#ffffff'] });
+        save(); updateDisplay();
     }
 
+    function toggleBankDay(bankIdx, dayIdx) {
+        const item = appData.b[bankIdx];
+        item.days = item.days.includes(dayIdx) ? item.days.filter(d => d !== dayIdx) : [...item.days, dayIdx];
+        save(); updateDisplay();
+    }
+
+    function editBank(i) {
+        const newN = prompt("修改銀行項目名稱：", appData.b[i].n);
+        const newP = prompt("修改項目點數：", appData.b[i].p);
+        if (newN !== null && newP !== null) {
+            appData.b[i].n = newN;
+            appData.b[i].p = parseInt(newP) || 0;
+            save(); updateDisplay();
+        }
+    }
+
+    function syncPoints() { const t = appData.b.find(x => x.n === document.getElementById('habitBankSelect').value); if(t) document.getElementById('pointInput').value = t.p; }
+    function addHabitFromSelect() {
+        const n = document.getElementById('habitBankSelect').value, p = parseInt(document.getElementById('pointInput').value) || 0;
+        if (n) { if(!appData.h[todayStr]) appData.h[todayStr] = []; appData.h[todayStr].push({ n, p, c: false }); save(); updateDisplay(); }
+    }
+    function addToBank() {
+        const n = document.getElementById('newBankName').value, p = parseInt(document.getElementById('newBankPoints').value) || 0;
+        if (n) { appData.b.push({ n, p, days: [0,1,2,3,4,5,6] }); save(); updateDisplay(); document.getElementById('newBankName').value = ''; }
+    }
+    function removeFromBank(i) { if(confirm("從銀行永久刪除此項？")) { appData.b.splice(i, 1); save(); updateDisplay(); } }
+    function removeHabit(i) { appData.h[todayStr].splice(i, 1); save(); updateDisplay(); }
+
+    function fixStar(date, name) {
+        if (appData.l[date] && appData.l[date][name] > 0 && confirm(`刪除星星並扣分？`)) {
+            const t = appData.b.find(x => x.n === name) || {p:0};
+            appData.l[date][name]--; appData.s.w = Math.max(0, appData.s.w - t.p);
+            save(); updateDisplay();
+        }
+    }
+    function undoLastAction() {
+        if(appData.s.ln && confirm(`撤銷最後一次加分？`)){
+            const d = appData.s.ld, n = appData.s.ln;
+            if(appData.l[d] && appData.l[d][n] > 0) appData.l[d][n]--;
+            appData.s.w = Math.max(0, appData.s.w - appData.s.lp);
+            appData.s.ln = ""; save(); updateDisplay();
+        }
+    }
+    function exportData() {
+        const code = btoa(encodeURIComponent(JSON.stringify(appData))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        navigator.clipboard.writeText(code).then(() => alert(`備份碼已複製`));
+    }
+    function importData() {
+        let code = prompt("還原碼：");
+        if(code){
+            try {
+                code = code.replace(/-/g, '+').replace(/_/g, '/');
+                while (code.length % 4) code += '=';
+                appData = JSON.parse(decodeURIComponent(atob(code)));
+                save(); location.reload();
+            } catch (e) { alert("代碼格式不正確"); }
+        }
+    }
+    function getCurrWeekDays() {
+        const curr = new Date();
+        const first = curr.getDate() - (curr.getDay() === 0 ? 6 : curr.getDay() - 1);
+        return [...Array(7).keys()].map(i => new Date(new Date().setDate(first + i)).toISOString().split('T')[0]);
+    }
+    function toggleAdmin() { const p = document.getElementById('adminPanel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; }
+    function redeemPoints() { 
+        const c = prompt("扣除幾分兌換獎勵？"); 
+        if(c && appData.s.w >= parseInt(c)){ appData.s.w -= parseInt(c); save(); updateDisplay(); } 
+    }
+    function fullReset() { if(confirm("這將刪除所有雲端資料與本地紀錄，確定嗎？")){ localStorage.clear(); location.reload(); } }
+
+    initDayTasks();
+    updateDisplay();
+</script>
+</body>
+</html>
     function updateDisplay() {
         document.getElementById('totalWallet').innerText = stats.totalWallet;
 
@@ -233,3 +358,4 @@
 </script>
 </body>
 </html>
+
