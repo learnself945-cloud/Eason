@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>小超人成長大冒險 v58</title>
+    <title>小超人成長大冒險 v62</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
@@ -18,24 +18,26 @@
             font-family: "PingFang TC", "STHeitiTC-Light", "Microsoft JhengHei", sans-serif; 
             background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; 
         }
-        .app-card { width: 100%; max-width: 600px; background: var(--card); border-radius: 35px; box-shadow: 0 10px 30px rgba(67,40,24,0.08); padding: 25px; min-height: 92vh; }
+        .app-card { width: 100%; max-width: 600px; background: var(--card); border-radius: 35px; box-shadow: 0 10px 30px rgba(67,40,24,0.08); padding: 20px; min-height: 92vh; }
         
         .main-score { background: linear-gradient(135deg, var(--accent), var(--primary)); color: #fff; padding: 25px; border-radius: 28px; text-align: center; margin-bottom: 20px; }
         .main-score span { font-size: 3.5em; font-weight: 800; display: block; margin-top: 5px; }
         
-        .unlock-bar { text-align: center; margin-bottom: 15px; }
-        .btn-unlock { background: #fff; border: 2px solid var(--accent); color: var(--accent); padding: 8px 20px; border-radius: 20px; font-weight: bold; cursor: pointer; }
-        .btn-unlock.active { background: #fde2e4; border-color: #f08080; color: #d00000; }
+        /* 頂部工具欄樣式 */
+        .system-toolbar { display: flex; gap: 8px; margin-bottom: 20px; }
+        .btn-tool { flex: 1; padding: 10px 5px; border-radius: 15px; border: 1.5px solid var(--accent); background: white; color: var(--accent); font-weight: bold; cursor: pointer; font-size: 0.8em; }
+        .btn-tool.active { background: #fde2e4; border-color: #f08080; color: #d00000; }
+        .btn-tool:active { transform: scale(0.98); }
 
         .date-navigator { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; background: #ede0d4; border-radius: 12px; padding: 5px 15px; }
         .nav-arrow { font-size: 1.5em; color: var(--accent); cursor: pointer; user-select: none; padding: 5px 10px; }
         .day-label { font-size: 1.1em; font-weight: bold; color: var(--accent); }
         .is-not-today { color: #b08968; font-size: 0.8em; cursor: pointer; }
 
-        .habit-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 10px; border-bottom: 1px solid #fcf2e8; background: white; }
+        .habit-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 10px; border-bottom: 1px solid #fcf2e8; }
         .drag-handle { cursor: grab; color: #b08968; padding-right: 15px; font-size: 1.3em; user-select: none; }
         .habit-info { display: flex; align-items: center; gap: 10px; flex: 1; }
-        .habit-name { font-size: 1.1em; font-weight: 600; color: var(--accent); }
+        .habit-name { font-size: 1.1em; font-weight: 600; color: var(--accent); cursor: pointer; }
         .habit-name.checked { color: #bb9457; text-decoration: line-through; opacity: 0.6; }
 
         .quick-add { background: #faf3e0; padding: 18px; border-radius: 22px; margin: 20px 0 12px 0; border: 1px solid #ede0d4; }
@@ -52,17 +54,13 @@
         .day-chip { display: inline-block; padding: 4px 8px; font-size: 0.8em; background: #eee; border-radius: 8px; margin-right: 4px; color: #999; cursor: pointer; }
         .day-chip.active { background: var(--accent); color: white; }
         
-        .collapse-btn { width: 100%; padding: 12px; background: #fff; border: 2px dashed var(--primary); color: var(--accent); border-radius: 15px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-        .bank-add-content { display: none; background: #fff; padding: 15px; border-radius: 15px; border: 1px solid var(--secondary); margin-bottom: 20px; }
-
         .report-section { margin-top: 25px; background: #fff; padding: 10px; border-radius: 22px; border: 1.5px solid #ede0d4; overflow-x: auto; }
         .report-table { width: 100%; border-collapse: collapse; font-size: 0.85em; text-align: center; min-width: 450px; }
-        .report-table th { padding: 8px 0; color: var(--accent); border-bottom: 1.5px solid #fcf2e8; }
-        .report-table td { padding: 10px 0; cursor: pointer; border-bottom: 1px solid #fcf2e8; }
-        .count-badge { background: var(--gold); color: var(--text); padding: 2px 8px; border-radius: 10px; font-weight: bold; font-size: 0.9em; }
-        
+        .report-table td { padding: 10px 0; border-bottom: 1px solid #fcf2e8; }
+        .count-badge { background: var(--gold); color: var(--text); padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+
         .danger-zone { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
-        .btn-secondary-outline { width: 100%; padding: 8px; background: none; border: 1px solid #ccc; color: #999; border-radius: 10px; font-size: 0.85em; margin-bottom: 10px; cursor: pointer; }
+        .btn-secondary-outline { width: 100%; padding: 8px; background: none; border: 1px solid #ccc; color: #999; border-radius: 10px; font-size: 0.85em; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -73,8 +71,10 @@
         <span id="totalWallet">0</span>
     </div>
 
-    <div class="unlock-bar">
-        <button id="unlockBtn" class="btn-unlock" onclick="handleUnlockToggle()">🔓 開啟編輯功能</button>
+    <div class="system-toolbar">
+        <button class="btn-tool" onclick="exportData()">📤 匯出</button>
+        <button class="btn-tool" onclick="importData()">📥 匯入</button>
+        <button id="unlockBtn" class="btn-tool" onclick="handleUnlockToggle()">🔓 編輯</button>
     </div>
 
     <div class="date-navigator">
@@ -116,33 +116,9 @@
     <div style="margin-top:30px; text-align:center;">
         <div onclick="toggleAdmin()" style="color:#b08968; font-size:0.85em; text-decoration:underline; cursor:pointer;">⚙️ 管理員設定與銀行</div>
         <div id="adminPanel" class="admin-panel">
-            
-            <button class="collapse-btn" id="bankCollapseBtn" onclick="toggleBankAddArea()">➕ 新增銀行排程任務 (展開)</button>
-            <div id="bankAddArea" class="bank-add-content">
-                <div class="input-row">
-                    <input type="text" id="newBankName" placeholder="任務名稱" style="flex:1">
-                    <input type="number" id="newBankPoint" placeholder="分" style="width: 70px;">
-                </div>
-                <div style="margin: 10px 0; text-align:left;">
-                    <p style="font-size: 0.8em; color: #999; margin-bottom:5px;">自動出現於：</p>
-                    <div id="newBankDays">
-                        <span class="day-chip" onclick="this.classList.toggle('active')" data-day="0">一</span>
-                        <span class="day-chip" onclick="this.classList.toggle('active')" data-day="1">二</span>
-                        <span class="day-chip" onclick="this.classList.toggle('active')" data-day="2">三</span>
-                        <span class="day-chip" onclick="this.classList.toggle('active')" data-day="3">四</span>
-                        <span class="day-chip" onclick="this.classList.toggle('active')" data-day="4">五</span>
-                        <span class="day-chip" onclick="this.classList.toggle('active')" data-day="5">六</span>
-                        <span class="day-chip" onclick="this.classList.toggle('active')" data-day="6">日</span>
-                    </div>
-                </div>
-                <button onclick="addNewTaskToBank()" style="width:100%; padding:10px; background:var(--success); color:white; border:none; border-radius:10px; font-weight:bold;">💾 儲存到銀行</button>
-            </div>
-
             <button style="background:var(--primary); color:white; width:100%; border:none; border-radius:12px; height:45px; font-weight:bold; margin-bottom:20px;" id="refreshBtn" onclick="syncDateWithBank()">🔄 刷新排程清單</button>
-            
-            <h4 style="margin: 10px 0 10px; text-align:left; color:var(--accent);">📜 現有銀行清單</h4>
+            <h4 style="margin: 10px 0 10px; text-align:left; color:var(--accent);">📜 銀行清單 (解鎖後編輯)</h4>
             <div id="bankManagerList"></div>
-            
             <div class="danger-zone">
                 <button class="btn-secondary-outline" onclick="changeAppPassword()">🔑 修改管理密碼</button>
                 <button onclick="fullReset()" style="color:#ccc; border:none; background:none; font-size:0.75em; cursor:pointer;">🔥 徹底清除所有資料並重置</button>
@@ -154,44 +130,73 @@
 <script>
     const DB_KEY = 'heroApp_Global_Storage';
     const dayNames = ["日", "一", "二", "三", "四", "五", "六"];
-    
     let viewDate = new Date();
     const getTodayStr = (d) => d.toISOString().split('T')[0];
     const getDayIdx = (d) => (d.getDay() + 6) % 7;
     const getWeekNumber = (d) => {
-        const date = new Date(d.getTime());
-        date.setHours(0, 0, 0, 0);
+        const date = new Date(d.getTime()); date.setHours(0, 0, 0, 0);
         date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
         const week1 = new Date(date.getFullYear(), 0, 4);
         return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
     };
 
     let isEditMode = false;
-    // cw = currentWeek (用來判斷是否換週)
     let appData = JSON.parse(localStorage.getItem(DB_KEY)) || { b: [], h: {}, s: { w: 0, lp: 0, ln: "", ld: "" }, l: {}, pw: "2165", cw: getWeekNumber(new Date()) };
-
     function save() { localStorage.setItem(DB_KEY, JSON.stringify(appData)); }
 
-    // 檢查是否換週，如果是，清空報表紀錄
-    function checkWeeklyReset() {
-        const nowWeek = getWeekNumber(new Date());
-        if (appData.cw !== nowWeek) {
-            appData.l = {}; // 清空報表
-            appData.cw = nowWeek; // 更新週數
-            save();
-            console.log("新的一週開始，報表已重置");
-        }
+    // --- 工具欄功能 ---
+    function exportData() {
+        const defaultName = `小超人備份_${getTodayStr(new Date())}`;
+        const backupName = prompt("請為存檔命名：", defaultName);
+        if (backupName === null) return;
+        const blob = new Blob([JSON.stringify(appData)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `${backupName}.json`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
     }
 
-    function updateDisplay() {
-        checkWeeklyReset();
-        const curStr = getTodayStr(viewDate);
-        const todayStr = getTodayStr(new Date());
-        
-        document.getElementById('dateDisplay').innerText = `${curStr} 星期${dayNames[viewDate.getDay()]}`;
-        const indicator = document.getElementById('todayIndicator');
-        indicator.style.display = (curStr !== todayStr) ? 'block' : 'none';
+    function importData() {
+        const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = event => {
+                try {
+                    const imported = JSON.parse(event.target.result);
+                    if (confirm(`載入「${file.name.replace('.json','')}」？這會覆蓋目前進度。`)) {
+                        appData = imported; save(); location.reload();
+                    }
+                } catch (err) { alert("格式錯誤！"); }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
 
+    function handleUnlockToggle() {
+        if (!isEditMode) {
+            const input = prompt("管理密碼：");
+            if (input === appData.pw) { 
+                isEditMode = true; 
+                document.getElementById('unlockBtn').innerText = "🔒 退出"; 
+                document.getElementById('unlockBtn').classList.add('active'); 
+            }
+        } else { 
+            isEditMode = false; 
+            document.getElementById('unlockBtn').innerText = "🔓 編輯"; 
+            document.getElementById('unlockBtn').classList.remove('active'); 
+        }
+        updateDisplay();
+    }
+
+    // --- 核心邏輯 ---
+    function checkPermission() { if (!isEditMode) { alert("請先點擊上方「🔓 編輯」按鈕"); return false; } return true; }
+    function changeViewDate(offset) { viewDate.setDate(viewDate.getDate() + offset); updateDisplay(); }
+    
+    function updateDisplay() {
+        const curStr = getTodayStr(viewDate);
+        document.getElementById('dateDisplay').innerText = `${curStr} 星期${dayNames[viewDate.getDay()]}`;
+        document.getElementById('todayIndicator').style.display = (curStr !== getTodayStr(new Date())) ? 'block' : 'none';
         document.getElementById('totalWallet').innerText = appData.s.w;
         
         const tasks = appData.h[curStr] || [];
@@ -200,18 +205,14 @@
                 <div class="drag-handle">☰</div>
                 <div class="habit-info">
                     <input type="checkbox" style="width:22px;height:22px;" ${x.c ? 'checked' : ''} onchange="toggleCheck(${i})">
-                    <span class="habit-name ${x.c ? 'checked' : ''} ${isEditMode ? 'editable' : ''}" onclick="editTask(${i})">
-                        ${x.n}${x.p > 0 ? ` (+${x.p})` : ''}
-                    </span>
+                    <span class="habit-name ${x.c ? 'checked' : ''}" onclick="editTask(${i})">${x.n}${x.p > 0 ? ` (+${x.p})` : ''}</span>
                 </div>
                 <button class="btn-done" style="display: ${x.c ? 'block' : 'none'}" onclick="completeHabit(${i})">領星</button>
                 ${isEditMode ? `<span onclick="removeHabit(${i})" style="color:#d5bdaf; font-size:1.5em; cursor:pointer; padding-left:10px;">×</span>` : ''}
             </div>`).join('');
 
         const weekDays = getCurrWeekDays();
-        // 取得所有曾出現過的任務名稱
         const allTaskNames = [...new Set(Object.values(appData.h).flat().map(t => t.n))];
-        
         document.getElementById('reportContent').innerHTML = allTaskNames.map(name => `
             <tr><td style="font-weight:600; text-align:left; padding-left:10px; color:#7f5539">${name}</td>
             ${weekDays.map(d => {
@@ -224,136 +225,41 @@
             <div class="bank-item">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
                     <b onclick="editBankTask(${i})" style="${isEditMode?'cursor:pointer;text-decoration:underline':''}">${x.n} (${x.p}分)</b>
-                    ${isEditMode ? `<button onclick="removeFromBank(${i})" style="color:red; background:none; border:none; cursor:pointer;">刪除</button>` : ''}
+                    ${isEditMode ? `<button onclick="removeFromBank(${i})" style="color:red; background:none; border:none;">刪除</button>` : ''}
                 </div>
                 <div>
                     ${[0,1,2,3,4,5,6].map(d => `<span class="day-chip ${x.days && x.days.includes(d) ? 'active' : ''}" onclick="${isEditMode ? `toggleBankDay(${i}, ${d})` : ''}">${['一','二','三','四','五','六','日'][d]}</span>`).join('')}
                 </div>
             </div>`).join('');
 
-        document.getElementById('habitBankSelect').innerHTML = '<option value="">-- 從銀行選取 --</option>' + 
-            appData.b.map(x => `<option value="${x.n}">${x.n}</option>`).join('');
-            
+        document.getElementById('habitBankSelect').innerHTML = '<option value="">-- 從銀行選取 --</option>' + appData.b.map(x => `<option value="${x.n}">${x.n}</option>`).join('');
         initSortable();
     }
 
-    // 領星時累計次數
+    function editTask(i) { if (!checkPermission()) return; const dStr = getTodayStr(viewDate); const cur = appData.h[dStr][i]; const n = prompt("名稱：", cur.n); if (n === null) return; const p = prompt("點數：", cur.p); if (p !== null) { appData.h[dStr][i].n = n; appData.h[dStr][i].p = parseInt(p) || 0; save(); updateDisplay(); } }
+    function editBankTask(i) { if (!checkPermission()) return; const cur = appData.b[i]; const n = prompt("預設名稱：", cur.n); if (n === null) return; const p = prompt("預設點數：", cur.p); if (p !== null) { appData.b[i].n = n; appData.b[i].p = parseInt(p) || 0; save(); updateDisplay(); } }
     function completeHabit(i) {
-        const dStr = getTodayStr(viewDate);
-        const x = appData.h[dStr][i]; 
-        appData.s.w += x.p; 
-        appData.s.lp = x.p; appData.s.ln = x.n; appData.s.ld = dStr;
-        
-        if (!appData.l[dStr]) appData.l[dStr] = {};
-        appData.l[dStr][x.n] = (appData.l[dStr][x.n] || 0) + 1; // 累計次數
-        
-        appData.h[dStr][i].c = false; 
-        confetti({ particleCount: 150, spread: 70 }); 
-        save(); updateDisplay();
+        const dStr = getTodayStr(viewDate); const x = appData.h[dStr][i]; appData.s.w += x.p; appData.s.lp = x.p; appData.s.ln = x.n; appData.s.ld = dStr;
+        if (!appData.l[dStr]) appData.l[dStr] = {}; appData.l[dStr][x.n] = (appData.l[dStr][x.n] || 0) + 1;
+        appData.h[dStr][i].c = false; confetti({ particleCount: 150, spread: 70 }); save(); updateDisplay();
     }
-
-    // 撤銷時減少次數
-    function undoLastAction() { 
-        if(appData.s.ln && confirm(`確定要撤銷最後一次加分「${appData.s.ln}」嗎？`)){ 
-            appData.s.w = Math.max(0, appData.s.w - appData.s.lp); 
-            if(appData.l[appData.s.ld] && appData.l[appData.s.ld][appData.s.ln] > 0) {
-                appData.l[appData.s.ld][appData.s.ln]--; 
-            }
-            appData.s.ln = ""; 
-            save(); updateDisplay(); 
-        } 
-    }
-
-    // 手動增減次數
-    function fixStar(d, n) { 
-        const currentCount = (appData.l[d] && appData.l[d][n]) ? appData.l[d][n] : 0;
-        const action = prompt(`任務：${n}\n目前次數：${currentCount}\n\n請輸入新次數 (輸入 0 則清除，此處修改不影響總積分)：`, currentCount);
-        
-        if (action !== null) {
-            const newCount = parseInt(action);
-            if (!isNaN(newCount) && newCount >= 0) {
-                if (!appData.l[d]) appData.l[d] = {};
-                appData.l[d][n] = newCount;
-                save(); updateDisplay();
-            }
-        }
-    }
-
-    // --- 日期與導航功能 ---
-    function changeViewDate(offset) { viewDate.setDate(viewDate.getDate() + offset); updateDisplay(); }
-    function resetToToday() { viewDate = new Date(); updateDisplay(); }
-    function getCurrWeekDays() {
-        const curr = new Date();
-        const first = curr.getDate() - (curr.getDay() === 0 ? 6 : curr.getDay() - 1);
-        return [...Array(7).keys()].map(i => {
-            const d = new Date(new Date().setDate(first + i));
-            return d.toISOString().split('T')[0];
-        });
-    }
-
-    // --- 其餘基礎功能 (與 v57 相同) ---
-    function syncDateWithBank() {
-        const curStr = getTodayStr(viewDate);
-        const curDayIdx = getDayIdx(viewDate);
-        if (!appData.h[curStr]) appData.h[curStr] = [];
-        appData.b.forEach(b => { if (b.days && b.days.includes(curDayIdx) && !appData.h[curStr].some(t => t.n === b.n)) { appData.h[curStr].push({ n: b.n, p: b.p, c: false }); } });
-        save(); updateDisplay();
-    }
-    function toggleBankAddArea() {
-        const area = document.getElementById('bankAddArea');
-        const btn = document.getElementById('bankCollapseBtn');
-        if (area.style.display === 'block') { area.style.display = 'none'; btn.innerText = "➕ 新增銀行排程任務 (展開)"; }
-        else { area.style.display = 'block'; btn.innerText = "➖ 收起新增視窗"; }
-    }
-    function addNewTaskToBank() {
-        if (!checkPermission()) return;
-        const name = document.getElementById('newBankName').value, point = parseInt(document.getElementById('newBankPoint').value) || 0;
-        const days = Array.from(document.querySelectorAll('#newBankDays .day-chip.active')).map(c => parseInt(c.getAttribute('data-day')));
-        if (!name) return;
-        appData.b.push({ n: name, p: point, days: days });
-        save(); updateDisplay();
-        document.getElementById('newBankName').value = ''; document.getElementById('newBankPoint').value = '';
-        document.querySelectorAll('#newBankDays .day-chip').forEach(c => c.classList.remove('active')); toggleBankAddArea();
-    }
-    function handleUnlockToggle() {
-        if (!isEditMode) {
-            const input = prompt("管理密碼：");
-            if (input === appData.pw) { isEditMode = true; document.getElementById('unlockBtn').innerText = "🔒 退出編輯模式"; document.getElementById('unlockBtn').classList.add('active'); }
-        } else { isEditMode = false; document.getElementById('unlockBtn').innerText = "🔓 開啟編輯功能"; document.getElementById('unlockBtn').classList.remove('active'); }
-        updateDisplay();
-    }
-    function checkPermission() { if (!isEditMode) { alert("此操作需先解鎖編輯功能"); return false; } return true; }
+    function undoLastAction() { if(appData.s.ln && confirm(`撤銷「${appData.s.ln}」加分？`)){ appData.s.w = Math.max(0, appData.s.w - appData.s.lp); if(appData.l[appData.s.ld] && appData.l[appData.s.ld][appData.s.ln] > 0) appData.l[appData.s.ld][appData.s.ln]--; appData.s.ln = ""; save(); updateDisplay(); } }
+    function fixStar(d, n) { const cur = (appData.l[d] && appData.l[d][n]) ? appData.l[d][n] : 0; const act = prompt(`${n} 次數：`, cur); if (act !== null) { const v = parseInt(act); if (!isNaN(v) && v >= 0) { if (!appData.l[d]) appData.l[d] = {}; appData.l[d][n] = v; save(); updateDisplay(); } } }
+    function addHabitDirectly() { const n = document.getElementById('directNameInput').value, p = parseInt(document.getElementById('directPointInput').value) || 0; if (n) { if(!appData.h[getTodayStr(viewDate)]) appData.h[getTodayStr(viewDate)] = []; appData.h[getTodayStr(viewDate)].push({ n, p, c: false }); save(); updateDisplay(); document.getElementById('directNameInput').value=''; } }
+    function addHabitFromBankSelect() { const n = document.getElementById('habitBankSelect').value, p = parseInt(document.getElementById('bankPointInput').value) || 0; if (n) { if(!appData.h[getTodayStr(viewDate)]) appData.h[getTodayStr(viewDate)] = []; appData.h[getTodayStr(viewDate)].push({ n, p, c: false }); save(); updateDisplay(); } }
+    function syncDateWithBank() { const curStr = getTodayStr(viewDate), curDayIdx = getDayIdx(viewDate); if (!appData.h[curStr]) appData.h[curStr] = []; appData.b.forEach(b => { if (b.days && b.days.includes(curDayIdx) && !appData.h[curStr].some(t => t.n === b.n)) appData.h[curStr].push({ n: b.n, p: b.p, c: false }); }); save(); updateDisplay(); }
     function toggleCheck(i) { appData.h[getTodayStr(viewDate)][i].c = !appData.h[getTodayStr(viewDate)][i].c; save(); updateDisplay(); }
-    function addHabitDirectly() {
-        const dStr = getTodayStr(viewDate);
-        const n = document.getElementById('directNameInput').value, p = parseInt(document.getElementById('directPointInput').value) || 0;
-        if (n) { if(!appData.h[dStr]) appData.h[dStr] = []; appData.h[dStr].push({ n, p, c: false }); save(); updateDisplay(); document.getElementById('directNameInput').value=''; }
-    }
-    function addHabitFromBankSelect() {
-        const dStr = getTodayStr(viewDate);
-        const n = document.getElementById('habitBankSelect').value, p = parseInt(document.getElementById('bankPointInput').value) || 0;
-        if (n) { if(!appData.h[dStr]) appData.h[dStr] = []; appData.h[dStr].push({ n, p, c: false }); save(); updateDisplay(); }
-    }
-    function editTask(i) { if (!checkPermission()) return; const dStr = getTodayStr(viewDate); const cur = appData.h[dStr][i]; const n = prompt("名稱：", cur.n); if (n) { appData.h[dStr][i].n = n; save(); updateDisplay(); } }
-    function removeHabit(i) { if(checkPermission()) { appData.h[getTodayStr(viewDate)].splice(i, 1); save(); updateDisplay(); } }
-    function toggleAdmin() { const p = document.getElementById('adminPanel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; }
-    function initSortable() {
-        const el = document.getElementById('habitList'); if(!el || !el.children.length) return;
-        Sortable.create(el, { handle: '.drag-handle', animation: 150, onEnd: function() {
-            const dStr = getTodayStr(viewDate); const newOrder = [];
-            el.querySelectorAll('.habit-item').forEach(item => { newOrder.push(appData.h[dStr][item.getAttribute('data-id')]); });
-            appData.h[dStr] = newOrder; save();
-        }});
-    }
+    function getCurrWeekDays() { const curr = new Date(); const first = curr.getDate() - (curr.getDay() === 0 ? 6 : curr.getDay() - 1); return [...Array(7).keys()].map(i => new Date(new Date().setDate(first + i)).toISOString().split('T')[0]); }
+    function initSortable() { const el = document.getElementById('habitList'); if(!el || !el.children.length) return; Sortable.create(el, { handle: '.drag-handle', animation: 150, onEnd: function() { const dStr = getTodayStr(viewDate); const newOrder = []; el.querySelectorAll('.habit-item').forEach(item => { newOrder.push(appData.h[dStr][item.getAttribute('data-id')]); }); appData.h[dStr] = newOrder; save(); }}); }
+    function removeHabit(i) { appData.h[getTodayStr(viewDate)].splice(i, 1); save(); updateDisplay(); }
+    function removeFromBank(i) { appData.b.splice(i, 1); save(); updateDisplay(); }
     function syncBankPoints() { const t = appData.b.find(x => x.n === document.getElementById('habitBankSelect').value); if(t) document.getElementById('bankPointInput').value = t.p; }
     function changeAppPassword() { if (!checkPermission()) return; const n = prompt("新密碼："); if(n) { appData.pw = n; save(); } }
-    function fullReset() { if(confirm("確定重置？")) { localStorage.clear(); location.reload(); } }
-    function removeFromBank(i) { if(checkPermission()) { appData.b.splice(i, 1); save(); updateDisplay(); } }
-    function editBankTask(i) { if (!checkPermission()) return; const cur = appData.b[i]; const n = prompt("銀行名稱：", cur.n); if (n) { appData.b[i].n = n; save(); updateDisplay(); } }
-    function toggleBankDay(bankIdx, dayIdx) { if (!appData.b[bankIdx].days) appData.b[bankIdx].days = []; const found = appData.b[bankIdx].days.indexOf(dayIdx); if (found > -1) appData.b[bankIdx].days.splice(found, 1); else appData.b[bankIdx].days.push(dayIdx); save(); updateDisplay(); }
+    function fullReset() { if(confirm("確定重置？資料將消失！")) { localStorage.clear(); location.reload(); } }
+    function toggleAdmin() { const p = document.getElementById('adminPanel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; }
+    function toggleBankDay(idx, d) { if (!appData.b[idx].days) appData.b[idx].days = []; const f = appData.b[idx].days.indexOf(d); if (f > -1) appData.b[idx].days.splice(f, 1); else appData.b[idx].days.push(d); save(); updateDisplay(); }
     function redeemPoints() { const c = prompt("扣除點數："); if(c && appData.s.w >= parseInt(c)) { appData.s.w -= parseInt(c); save(); updateDisplay(); } }
 
-    if (!appData.h[getTodayStr(viewDate)]) syncDateWithBank();
     updateDisplay();
 </script>
 </body>
