@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>小超人成長大冒險 v36-Ultimate</title>
+    <title>小超人成長大冒險 v37-FlexPoint</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root { 
@@ -89,19 +89,15 @@
         <div onclick="toggleAdmin()" style="color:#b08968; font-size:0.85em; text-decoration:underline; cursor:pointer;">⚙️ SETTINGS (設定與圖庫)</div>
         <div id="adminPanel" class="admin-panel">
             <button class="btn-sync" onclick="syncTodayWithBank()">🔄 依照排程更新今日清單</button>
-            
             <h4 style="margin: 10px 0; color:var(--accent);">圖庫選擇</h4>
             <div class="emoji-box" id="emojiPicker"></div>
-
             <div class="input-row">
                 <input type="text" id="newBankName" placeholder="選圖標或輸名稱" style="flex:2">
                 <input type="number" id="newBankPoints" placeholder="分" style="width:55px">
                 <button onclick="addToBank()" style="background:var(--success); color:white; border:none; border-radius:12px; padding:0 15px;">儲存</button>
             </div>
-
             <h4 style="margin: 20px 0 10px; color:var(--accent);">任務銀行 (排程設定)</h4>
             <div id="bankList" style="text-align:left; max-height:300px; overflow-y:auto; margin-bottom:15px; padding-right:5px;"></div>
-            
             <div style="display:flex; gap:10px; margin-top:10px;">
                 <button class="btn-sm" style="flex:1" onclick="exportData()">📤 備份</button>
                 <button class="btn-sm" style="flex:1" onclick="importData()">📥 還原</button>
@@ -112,7 +108,6 @@
 </div>
 
 <script>
-    // 使用固定的 Key 確保不同版本的代碼可以共用同一筆資料
     const DB_KEY = 'heroApp_Global_Storage';
     const dayNames = ["日", "一", "二", "三", "四", "五", "六"];
     const emojis = ["🧠", "📖", "🧹", "📝", "💻", "🎹", "🏀", "🎨", "🧪", "🚿", "🏃", "🛌", "🍎", "🧸", "🌟", "✨"];
@@ -122,12 +117,9 @@
     const defaultBank = [
         {n: "🧠 奧數", p: 20, days:[0,1,2,3,4,5,6]},
         {n: "📖 英文雜誌", p: 15, days:[0,1,2,3,4,5,6]},
-        {n: "🧹 家事", p: 10, days:[0,1,2,3,4,5,6]},
-        {n: "📝 英文作業", p: 10, days:[0,1,2,3,4,5,6]},
-        {n: "💻 線上作業", p: 10, days:[0,1,2,3,4,5,6]}
+        {n: "🧹 家事", p: 10, days:[0,1,2,3,4,5,6]}
     ];
 
-    // 優先讀取舊資料，若無則使用預設
     let appData = JSON.parse(localStorage.getItem(DB_KEY)) || { 
         b: defaultBank, h: {}, s: { w: 0, lp: 0, ln: "", ld: "" }, l: {} 
     };
@@ -143,26 +135,9 @@
         }
     }
 
-    function syncTodayWithBank() {
-        if (!appData.h[todayStr]) appData.h[todayStr] = [];
-        let addedCount = 0;
-        appData.b.forEach(bankItem => {
-            if (bankItem.days.includes(todayDayIdx)) {
-                // 比對名稱（排除點數部分）
-                if (!appData.h[todayStr].some(t => t.n === bankItem.n)) {
-                    appData.h[todayStr].push({ n: bankItem.n, p: bankItem.p, c: false });
-                    addedCount++;
-                }
-            }
-        });
-        save(); updateDisplay();
-        alert(addedCount > 0 ? `已更新 ${addedCount} 項任務！` : "今日清單已是最新狀態。");
-    }
-
     function updateDisplay() {
         document.getElementById('totalWallet').innerText = appData.s.w;
         document.getElementById('todayLabel').innerText = `今天是星期${dayNames[new Date().getDay()]}`;
-        
         document.getElementById('habitBankSelect').innerHTML = '<option value="">-- 快速加入 --</option>' + 
             appData.b.map(x => `<option value="${x.n}">${x.n}</option>`).join('');
 
@@ -171,7 +146,7 @@
             <div class="habit-item">
                 <div class="habit-info">
                     <input type="checkbox" class="habit-checkbox" ${x.c ? 'checked' : ''} onchange="toggleCheck(${i})">
-                    <span class="habit-name ${x.c ? 'checked' : ''}" onclick="editHabitName(${i})">${x.n}${x.p > 0 ? ` (+${x.p})` : ''}</span>
+                    <span class="habit-name ${x.c ? 'checked' : ''}" onclick="editHabitDetails(${i})">${x.n}${x.p > 0 ? ` (+${x.p})` : ''}</span>
                 </div>
                 <button class="btn-done" style="display: ${x.c ? 'block' : 'none'}" onclick="completeHabit(${i})">完成領星</button>
                 <span onclick="removeHabit(${i})" style="color:#d5bdaf; padding-left:12px; cursor:pointer; font-size:1.5em; display:${x.c?'none':'block'}">×</span>
@@ -206,9 +181,19 @@
         `).join('');
     }
 
-    function editHabitName(i) {
-        const newName = prompt("編輯今日任務名稱：", appData.h[todayStr][i].n);
-        if (newName) { appData.h[todayStr][i].n = newName; save(); updateDisplay(); }
+    // 更新：同時修改名稱與點數
+    function editHabitDetails(i) {
+        const currentTask = appData.h[todayStr][i];
+        const newName = prompt("編輯今日任務名稱：", currentTask.n);
+        if (newName !== null) {
+            const newPoints = prompt("編輯此任務今日加分點數：", currentTask.p);
+            if (newPoints !== null) {
+                appData.h[todayStr][i].n = newName || currentTask.n;
+                appData.h[todayStr][i].p = parseInt(newPoints) || 0;
+                save();
+                updateDisplay();
+            }
+        }
     }
 
     function toggleCheck(i) { appData.h[todayStr][i].c = !appData.h[todayStr][i].c; save(); updateDisplay(); }
@@ -223,6 +208,21 @@
         save(); updateDisplay();
     }
 
+    function syncTodayWithBank() {
+        if (!appData.h[todayStr]) appData.h[todayStr] = [];
+        let addedCount = 0;
+        appData.b.forEach(bankItem => {
+            if (bankItem.days.includes(todayDayIdx)) {
+                if (!appData.h[todayStr].some(t => t.n === bankItem.n)) {
+                    appData.h[todayStr].push({ n: bankItem.n, p: bankItem.p, c: false });
+                    addedCount++;
+                }
+            }
+        });
+        save(); updateDisplay();
+        alert(addedCount > 0 ? `已同步 ${addedCount} 項任務！` : "今日清單已對齊。");
+    }
+
     function toggleBankDay(bankIdx, dayIdx) {
         const item = appData.b[bankIdx];
         item.days = item.days.includes(dayIdx) ? item.days.filter(d => d !== dayIdx) : [...item.days, dayIdx];
@@ -231,12 +231,8 @@
 
     function editBank(i) {
         const newN = prompt("修改銀行項目名稱：", appData.b[i].n);
-        const newP = prompt("修改項目點數：", appData.b[i].p);
-        if (newN !== null && newP !== null) {
-            appData.b[i].n = newN;
-            appData.b[i].p = parseInt(newP) || 0;
-            save(); updateDisplay();
-        }
+        const newP = prompt("修改預設加分：", appData.b[i].p);
+        if (newN !== null && newP !== null) { appData.b[i].n = newN; appData.b[i].p = parseInt(newP) || 0; save(); updateDisplay(); }
     }
 
     function syncPoints() { const t = appData.b.find(x => x.n === document.getElementById('habitBankSelect').value); if(t) document.getElementById('pointInput').value = t.p; }
@@ -248,7 +244,7 @@
         const n = document.getElementById('newBankName').value, p = parseInt(document.getElementById('newBankPoints').value) || 0;
         if (n) { appData.b.push({ n, p, days: [0,1,2,3,4,5,6] }); save(); updateDisplay(); document.getElementById('newBankName').value = ''; }
     }
-    function removeFromBank(i) { if(confirm("從銀行永久刪除此項？")) { appData.b.splice(i, 1); save(); updateDisplay(); } }
+    function removeFromBank(i) { if(confirm("從銀行永久刪除？")) { appData.b.splice(i, 1); save(); updateDisplay(); } }
     function removeHabit(i) { appData.h[todayStr].splice(i, 1); save(); updateDisplay(); }
 
     function fixStar(date, name) {
@@ -271,14 +267,14 @@
         navigator.clipboard.writeText(code).then(() => alert(`備份碼已複製`));
     }
     function importData() {
-        let code = prompt("還原碼：");
+        let code = prompt("輸入還原碼：");
         if(code){
             try {
                 code = code.replace(/-/g, '+').replace(/_/g, '/');
                 while (code.length % 4) code += '=';
                 appData = JSON.parse(decodeURIComponent(atob(code)));
                 save(); location.reload();
-            } catch (e) { alert("代碼格式不正確"); }
+            } catch (e) { alert("代碼錯誤"); }
         }
     }
     function getCurrWeekDays() {
@@ -288,10 +284,10 @@
     }
     function toggleAdmin() { const p = document.getElementById('adminPanel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; }
     function redeemPoints() { 
-        const c = prompt("扣除幾分兌換獎勵？"); 
+        const c = prompt("扣幾分兌換？"); 
         if(c && appData.s.w >= parseInt(c)){ appData.s.w -= parseInt(c); save(); updateDisplay(); } 
     }
-    function fullReset() { if(confirm("這將刪除所有雲端資料與本地紀錄，確定嗎？")){ localStorage.clear(); location.reload(); } }
+    function fullReset() { if(confirm("確定徹底清空？")){ localStorage.clear(); location.reload(); } }
 
     initDayTasks();
     updateDisplay();
