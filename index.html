@@ -2,126 +2,96 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>小超人成長大冒險 v62</title>
+    <title>小超人成長大冒險 v65</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <style>
-        :root { 
-            --primary: #b08968; --secondary: #e6ccb2; --accent: #7f5539; 
-            --bg: #f5ebe0; --card: #ffffff; --success: #9c6644; 
-            --gold: #ddb892; --text: #432818;
-        }
-        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
-        body { 
-            font-family: "PingFang TC", "STHeitiTC-Light", "Microsoft JhengHei", sans-serif; 
-            background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; 
-        }
+        :root { --primary: #b08968; --secondary: #e6ccb2; --accent: #7f5539; --bg: #f5ebe0; --card: #ffffff; --success: #9c6644; --gold: #ddb892; --text: #432818; }
+        * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; -webkit-touch-callout: none; }
+        body { font-family: "PingFang TC", "Microsoft JhengHei", sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; touch-action: pan-y; }
         .app-card { width: 100%; max-width: 600px; background: var(--card); border-radius: 35px; box-shadow: 0 10px 30px rgba(67,40,24,0.08); padding: 20px; min-height: 92vh; }
-        
         .main-score { background: linear-gradient(135deg, var(--accent), var(--primary)); color: #fff; padding: 25px; border-radius: 28px; text-align: center; margin-bottom: 20px; }
         .main-score span { font-size: 3.5em; font-weight: 800; display: block; margin-top: 5px; }
-        
-        /* 頂部工具欄樣式 */
         .system-toolbar { display: flex; gap: 8px; margin-bottom: 20px; }
         .btn-tool { flex: 1; padding: 10px 5px; border-radius: 15px; border: 1.5px solid var(--accent); background: white; color: var(--accent); font-weight: bold; cursor: pointer; font-size: 0.8em; }
         .btn-tool.active { background: #fde2e4; border-color: #f08080; color: #d00000; }
-        .btn-tool:active { transform: scale(0.98); }
-
         .date-navigator { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; background: #ede0d4; border-radius: 12px; padding: 5px 15px; }
-        .nav-arrow { font-size: 1.5em; color: var(--accent); cursor: pointer; user-select: none; padding: 5px 10px; }
-        .day-label { font-size: 1.1em; font-weight: bold; color: var(--accent); }
-        .is-not-today { color: #b08968; font-size: 0.8em; cursor: pointer; }
-
-        .habit-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 10px; border-bottom: 1px solid #fcf2e8; }
-        .drag-handle { cursor: grab; color: #b08968; padding-right: 15px; font-size: 1.3em; user-select: none; }
+        .nav-arrow { font-size: 1.5em; color: var(--accent); cursor: pointer; padding: 5px 10px; }
+        .habit-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 10px; border-bottom: 1px solid #fcf2e8; background: white; }
+        .drag-handle { cursor: grab; color: #b08968; padding: 10px 20px 10px 5px; font-size: 1.4em; touch-action: none; user-select: none; }
         .habit-info { display: flex; align-items: center; gap: 10px; flex: 1; }
         .habit-name { font-size: 1.1em; font-weight: 600; color: var(--accent); cursor: pointer; }
         .habit-name.checked { color: #bb9457; text-decoration: line-through; opacity: 0.6; }
-
         .quick-add { background: #faf3e0; padding: 18px; border-radius: 22px; margin: 20px 0 12px 0; border: 1px solid #ede0d4; }
         .input-row { display: flex; gap: 8px; margin-bottom: 8px; }
         select, input { padding: 12px; border: 1.5px solid #ede0d4; border-radius: 14px; font-size: 15px; outline: none; }
-
         .btn-done { background: var(--success); color: white; border: none; padding: 10px 18px; border-radius: 25px; font-weight: bold; cursor: pointer; }
         .btn-action { flex: 1; padding: 15px; border: none; border-radius: 16px; font-weight: bold; cursor: pointer; }
-        .btn-undo { background: #ede0d4; color: var(--accent); }
-        .btn-redeem { background: var(--gold); color: #432818; }
-
         .admin-panel { display: none; background: #fdfaf7; padding: 20px; border-radius: 20px; margin-top: 15px; border: 1px solid #ede0d4; }
         .bank-item { background: white; padding: 15px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 12px; text-align: left; }
         .day-chip { display: inline-block; padding: 4px 8px; font-size: 0.8em; background: #eee; border-radius: 8px; margin-right: 4px; color: #999; cursor: pointer; }
         .day-chip.active { background: var(--accent); color: white; }
-        
         .report-section { margin-top: 25px; background: #fff; padding: 10px; border-radius: 22px; border: 1.5px solid #ede0d4; overflow-x: auto; }
         .report-table { width: 100%; border-collapse: collapse; font-size: 0.85em; text-align: center; min-width: 450px; }
         .report-table td { padding: 10px 0; border-bottom: 1px solid #fcf2e8; }
         .count-badge { background: var(--gold); color: var(--text); padding: 2px 8px; border-radius: 10px; font-weight: bold; }
-
-        .danger-zone { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
         .btn-secondary-outline { width: 100%; padding: 8px; background: none; border: 1px solid #ccc; color: #999; border-radius: 10px; font-size: 0.85em; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="app-card">
-    <div class="main-score">
-        <div>COIN WALLET</div>
-        <span id="totalWallet">0</span>
-    </div>
-
+    <div class="main-score"><div>COIN WALLET</div><span id="totalWallet">0</span></div>
+    
     <div class="system-toolbar">
         <button class="btn-tool" onclick="exportData()">📤 匯出</button>
         <button class="btn-tool" onclick="importData()">📥 匯入</button>
-        <button id="unlockBtn" class="btn-tool" onclick="handleUnlockToggle()">🔓 編輯</button>
+        <button id="unlockBtn" class="btn-tool" onclick="toggleEditMode()">🔓 編輯</button>
     </div>
 
     <div class="date-navigator">
-        <div class="nav-arrow" onclick="changeViewDate(-1)">◀</div>
-        <div style="text-align:center">
-            <div class="day-label" id="dateDisplay">載入中...</div>
-            <div id="todayIndicator" class="is-not-today" style="display:none">(點此回今天)</div>
-        </div>
-        <div class="nav-arrow" onclick="changeViewDate(1)">▶</div>
+        <div class="nav-arrow" onclick="changeDate(-1)">◀</div>
+        <div style="text-align:center"><div class="day-label" id="dateDisplay">載入中...</div></div>
+        <div class="nav-arrow" onclick="changeDate(1)">▶</div>
     </div>
 
     <div id="habitList"></div>
 
     <div class="quick-add">
         <div class="input-row">
-            <input type="text" id="directNameInput" placeholder="臨時任務名稱" style="flex:1">
-            <input type="number" id="directPointInput" placeholder="分" style="width: 65px;">
-            <button onclick="addHabitDirectly()" style="background:var(--success);color:white;border:none;border-radius:12px;padding:0 12px;">➕</button>
+            <input type="text" id="directName" placeholder="臨時任務名稱" style="flex:1">
+            <input type="number" id="directPoint" placeholder="分" style="width: 65px;">
+            <button onclick="addFromInput('directName','directPoint')" style="background:var(--success);color:white;border:none;border-radius:12px;padding:0 12px;">➕</button>
         </div>
         <div class="input-row">
-            <select id="habitBankSelect" onchange="syncBankPoints()" style="flex:1"></select>
-            <input type="number" id="bankPointInput" placeholder="分" style="width: 65px;">
-            <button onclick="addHabitFromBankSelect()" style="background:var(--accent);color:white;border:none;border-radius:12px;padding:0 12px;">√</button>
+            <select id="bankSelect" onchange="syncBankPoints()" style="flex:1"></select>
+            <input type="number" id="bankPoint" placeholder="分" style="width: 65px;">
+            <button onclick="addFromInput('bankSelect','bankPoint')" style="background:var(--accent);color:white;border:none;border-radius:12px;padding:0 12px;">√</button>
         </div>
     </div>
 
-    <div style="display:flex; gap:12px;">
-        <button onclick="undoLastAction()" class="btn-action btn-undo">↩ 撤銷加分</button>
-        <button onclick="redeemPoints()" class="btn-action btn-redeem">🎁 兌換獎勵</button>
-    </div>
+    <div style="display:flex; gap:12px;"><button onclick="undo()" class="btn-action" style="background:#ede0d4;color:var(--accent);">↩ 撤銷</button><button onclick="redeem()" class="btn-action" style="background:var(--gold);color:#432818;">🎁 兌換</button></div>
 
-    <div class="report-section">
-        <table class="report-table">
-            <thead><tr><th>任務</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th><th>日</th></tr></thead>
-            <tbody id="reportContent"></tbody>
-        </table>
-    </div>
+    <div class="report-section"><table class="report-table"><thead><tr><th>任務</th><th>一</th><th>二</th><th>三</th><th>四</th><th>五</th><th>六</th><th>日</th></tr></thead><tbody id="reportContent"></tbody></table></div>
 
     <div style="margin-top:30px; text-align:center;">
-        <div onclick="toggleAdmin()" style="color:#b08968; font-size:0.85em; text-decoration:underline; cursor:pointer;">⚙️ 管理員設定與銀行</div>
+        <div onclick="toggleAdmin()" style="color:#b08968; font-size:0.85em; text-decoration:underline; cursor:pointer;">⚙️ 管理員與銀行範本</div>
         <div id="adminPanel" class="admin-panel">
-            <button style="background:var(--primary); color:white; width:100%; border:none; border-radius:12px; height:45px; font-weight:bold; margin-bottom:20px;" id="refreshBtn" onclick="syncDateWithBank()">🔄 刷新排程清單</button>
-            <h4 style="margin: 10px 0 10px; text-align:left; color:var(--accent);">📜 銀行清單 (解鎖後編輯)</h4>
+            <div id="bankAddSection" style="display:none; background:#fff; padding:15px; border-radius:18px; margin-bottom:20px; border:1px dashed var(--primary); text-align:left;">
+                <h4 style="margin:0 0 10px 0; color:var(--accent);">✨ 新增銀行範本</h4>
+                <div class="input-row">
+                    <input type="text" id="newBankName" placeholder="名稱" style="flex:1">
+                    <input type="number" id="newBankPoint" placeholder="分" style="width:65px;">
+                    <button onclick="addNewBankItem()" style="background:var(--primary); color:white; border:none; border-radius:12px; padding:0 15px;">儲存</button>
+                </div>
+            </div>
+
+            <button style="background:var(--primary); color:white; width:100%; border:none; border-radius:12px; height:45px; font-weight:bold; margin-bottom:20px;" onclick="syncWithBank()">🔄 刷新今日排程清單</button>
             <div id="bankManagerList"></div>
-            <div class="danger-zone">
-                <button class="btn-secondary-outline" onclick="changeAppPassword()">🔑 修改管理密碼</button>
-                <button onclick="fullReset()" style="color:#ccc; border:none; background:none; font-size:0.75em; cursor:pointer;">🔥 徹底清除所有資料並重置</button>
+            <div style="margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+                <button class="btn-secondary-outline" onclick="changePw()">🔑 修改管理密碼</button>
+                <button onclick="fullReset()" style="color:#ccc; border:none; background:none; font-size:0.75em; cursor:pointer; margin-top:10px;">🔥 徹底清除重置</button>
             </div>
         </div>
     </div>
@@ -130,135 +100,93 @@
 <script>
     const DB_KEY = 'heroApp_Global_Storage';
     const dayNames = ["日", "一", "二", "三", "四", "五", "六"];
-    let viewDate = new Date();
-    const getTodayStr = (d) => d.toISOString().split('T')[0];
-    const getDayIdx = (d) => (d.getDay() + 6) % 7;
-    const getWeekNumber = (d) => {
-        const date = new Date(d.getTime()); date.setHours(0, 0, 0, 0);
-        date.setDate(date.getDate() + 3 - (date.getDay() + 6) % 7);
-        const week1 = new Date(date.getFullYear(), 0, 4);
-        return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
-    };
+    let viewDate = new Date(), isEditMode = false;
+    let appData = JSON.parse(localStorage.getItem(DB_KEY)) || { b: [], h: {}, s: { w: 0, lp: 0, ln: "", ld: "" }, l: {}, pw: "2165" };
+    
+    const save = () => localStorage.setItem(DB_KEY, JSON.stringify(appData));
+    const curD = () => viewDate.toISOString().split('T')[0];
+    const commit = () => { save(); updateDisplay(); };
+    const checkPerm = () => isEditMode || (alert("請先點擊上方「🔓 編輯」") && false);
 
-    let isEditMode = false;
-    let appData = JSON.parse(localStorage.getItem(DB_KEY)) || { b: [], h: {}, s: { w: 0, lp: 0, ln: "", ld: "" }, l: {}, pw: "2165", cw: getWeekNumber(new Date()) };
-    function save() { localStorage.setItem(DB_KEY, JSON.stringify(appData)); }
-
-    // --- 工具欄功能 ---
-    function exportData() {
-        const defaultName = `小超人備份_${getTodayStr(new Date())}`;
-        const backupName = prompt("請為存檔命名：", defaultName);
-        if (backupName === null) return;
-        const blob = new Blob([JSON.stringify(appData)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a'); a.href = url; a.download = `${backupName}.json`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    }
-
-    function importData() {
-        const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
-        input.onchange = e => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-            reader.onload = event => {
-                try {
-                    const imported = JSON.parse(event.target.result);
-                    if (confirm(`載入「${file.name.replace('.json','')}」？這會覆蓋目前進度。`)) {
-                        appData = imported; save(); location.reload();
-                    }
-                } catch (err) { alert("格式錯誤！"); }
-            };
-            reader.readAsText(file);
-        };
-        input.click();
-    }
-
-    function handleUnlockToggle() {
+    function toggleEditMode() {
         if (!isEditMode) {
-            const input = prompt("管理密碼：");
-            if (input === appData.pw) { 
-                isEditMode = true; 
-                document.getElementById('unlockBtn').innerText = "🔒 退出"; 
-                document.getElementById('unlockBtn').classList.add('active'); 
-            }
-        } else { 
-            isEditMode = false; 
-            document.getElementById('unlockBtn').innerText = "🔓 編輯"; 
-            document.getElementById('unlockBtn').classList.remove('active'); 
-        }
+            if(prompt("管理密碼：") === appData.pw) isEditMode = true;
+        } else { isEditMode = false; }
+        document.getElementById('unlockBtn').innerText = isEditMode ? "🔒 退出" : "🔓 編輯";
+        document.getElementById('unlockBtn').classList.toggle('active', isEditMode);
         updateDisplay();
     }
 
-    // --- 核心邏輯 ---
-    function checkPermission() { if (!isEditMode) { alert("請先點擊上方「🔓 編輯」按鈕"); return false; } return true; }
-    function changeViewDate(offset) { viewDate.setDate(viewDate.getDate() + offset); updateDisplay(); }
-    
     function updateDisplay() {
-        const curStr = getTodayStr(viewDate);
-        document.getElementById('dateDisplay').innerText = `${curStr} 星期${dayNames[viewDate.getDay()]}`;
-        document.getElementById('todayIndicator').style.display = (curStr !== getTodayStr(new Date())) ? 'block' : 'none';
+        const d = curD();
+        document.getElementById('dateDisplay').innerText = `${d} (${dayNames[viewDate.getDay()]})`;
         document.getElementById('totalWallet').innerText = appData.s.w;
+        document.getElementById('bankAddSection').style.display = isEditMode ? 'block' : 'none';
         
-        const tasks = appData.h[curStr] || [];
+        const tasks = appData.h[d] || [];
         document.getElementById('habitList').innerHTML = tasks.map((x, i) => `
-            <div class="habit-item" data-id="${i}">
-                <div class="drag-handle">☰</div>
+            <div class="habit-item" data-id="${i}"><div class="drag-handle">☰</div>
                 <div class="habit-info">
-                    <input type="checkbox" style="width:22px;height:22px;" ${x.c ? 'checked' : ''} onchange="toggleCheck(${i})">
-                    <span class="habit-name ${x.c ? 'checked' : ''}" onclick="editTask(${i})">${x.n}${x.p > 0 ? ` (+${x.p})` : ''}</span>
+                    <input type="checkbox" style="width:22px;height:22px;" ${x.c?'checked':''} onchange="toggleCheck(${i})">
+                    <span class="habit-name ${x.c?'checked':''}" onclick="editTask(${i})">${x.n} (+${x.p})</span>
                 </div>
-                <button class="btn-done" style="display: ${x.c ? 'block' : 'none'}" onclick="completeHabit(${i})">領星</button>
-                ${isEditMode ? `<span onclick="removeHabit(${i})" style="color:#d5bdaf; font-size:1.5em; cursor:pointer; padding-left:10px;">×</span>` : ''}
+                <button class="btn-done" style="display:${x.c?'block':'none'}" onclick="complete(${i})">領星</button>
+                ${isEditMode ? `<span onclick="removeH(${i})" style="color:#d5bdaf; font-size:1.5em; padding-left:10px; cursor:pointer;">×</span>` : ''}
             </div>`).join('');
-
-        const weekDays = getCurrWeekDays();
-        const allTaskNames = [...new Set(Object.values(appData.h).flat().map(t => t.n))];
-        document.getElementById('reportContent').innerHTML = allTaskNames.map(name => `
-            <tr><td style="font-weight:600; text-align:left; padding-left:10px; color:#7f5539">${name}</td>
-            ${weekDays.map(d => {
-                const count = (appData.l[d] && appData.l[d][name]) ? appData.l[d][name] : 0;
-                return `<td onclick="fixStar('${d}', '${name}')">${count > 0 ? `<span class="count-badge">${count}</span>` : '-'}</td>`;
-            }).join('')}
-            </tr>`).join('');
 
         document.getElementById('bankManagerList').innerHTML = appData.b.map((x, i) => `
-            <div class="bank-item">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
-                    <b onclick="editBankTask(${i})" style="${isEditMode?'cursor:pointer;text-decoration:underline':''}">${x.n} (${x.p}分)</b>
-                    ${isEditMode ? `<button onclick="removeFromBank(${i})" style="color:red; background:none; border:none;">刪除</button>` : ''}
-                </div>
-                <div>
-                    ${[0,1,2,3,4,5,6].map(d => `<span class="day-chip ${x.days && x.days.includes(d) ? 'active' : ''}" onclick="${isEditMode ? `toggleBankDay(${i}, ${d})` : ''}">${['一','二','三','四','五','六','日'][d]}</span>`).join('')}
-                </div>
-            </div>`).join('');
+            <div class="bank-item"><div style="display:flex; justify-content:space-between;"><b onclick="editBank(${i})">${x.n} (${x.p}分)</b>${isEditMode?`<button onclick="removeB(${i})" style="color:red;border:none;background:none;">刪除</button>`:''}</div>
+            <div style="margin-top:5px;">${[0,1,2,3,4,5,6].map(di => `<span class="day-chip ${x.days?.includes(di)?'active':''}" onclick="${isEditMode?`toggleBD(${i},${di})`:''}">${['一','二','三','四','五','六','日'][di]}</span>`).join('')}</div></div>`).join('');
 
-        document.getElementById('habitBankSelect').innerHTML = '<option value="">-- 從銀行選取 --</option>' + appData.b.map(x => `<option value="${x.n}">${x.n}</option>`).join('');
-        initSortable();
+        document.getElementById('bankSelect').innerHTML = '<option value="">-- 從銀行選取 --</option>' + appData.b.map(x => `<option value="${x.n}">${x.n}</option>`).join('');
+        updateReport(); initSortable();
     }
 
-    function editTask(i) { if (!checkPermission()) return; const dStr = getTodayStr(viewDate); const cur = appData.h[dStr][i]; const n = prompt("名稱：", cur.n); if (n === null) return; const p = prompt("點數：", cur.p); if (p !== null) { appData.h[dStr][i].n = n; appData.h[dStr][i].p = parseInt(p) || 0; save(); updateDisplay(); } }
-    function editBankTask(i) { if (!checkPermission()) return; const cur = appData.b[i]; const n = prompt("預設名稱：", cur.n); if (n === null) return; const p = prompt("預設點數：", cur.p); if (p !== null) { appData.b[i].n = n; appData.b[i].p = parseInt(p) || 0; save(); updateDisplay(); } }
-    function completeHabit(i) {
-        const dStr = getTodayStr(viewDate); const x = appData.h[dStr][i]; appData.s.w += x.p; appData.s.lp = x.p; appData.s.ln = x.n; appData.s.ld = dStr;
-        if (!appData.l[dStr]) appData.l[dStr] = {}; appData.l[dStr][x.n] = (appData.l[dStr][x.n] || 0) + 1;
-        appData.h[dStr][i].c = false; confetti({ particleCount: 150, spread: 70 }); save(); updateDisplay();
+    function updateReport() {
+        const curr = new Date(); const first = curr.getDate() - (curr.getDay() === 0 ? 6 : curr.getDay() - 1);
+        const days = [...Array(7).keys()].map(i => new Date(new Date().setDate(first + i)).toISOString().split('T')[0]);
+        const names = [...new Set(Object.values(appData.h).flat().map(t => t.n))];
+        document.getElementById('reportContent').innerHTML = names.map(n => `<tr><td style="text-align:left; padding-left:10px;">${n}</td>${days.map(d => `<td onclick="fixStar('${d}','${n}')">${appData.l[d]?.[n] ? `<span class="count-badge">${appData.l[d][n]}</span>` : '-'}</td>`).join('')}</tr>`).join('');
     }
-    function undoLastAction() { if(appData.s.ln && confirm(`撤銷「${appData.s.ln}」加分？`)){ appData.s.w = Math.max(0, appData.s.w - appData.s.lp); if(appData.l[appData.s.ld] && appData.l[appData.s.ld][appData.s.ln] > 0) appData.l[appData.s.ld][appData.s.ln]--; appData.s.ln = ""; save(); updateDisplay(); } }
-    function fixStar(d, n) { const cur = (appData.l[d] && appData.l[d][n]) ? appData.l[d][n] : 0; const act = prompt(`${n} 次數：`, cur); if (act !== null) { const v = parseInt(act); if (!isNaN(v) && v >= 0) { if (!appData.l[d]) appData.l[d] = {}; appData.l[d][n] = v; save(); updateDisplay(); } } }
-    function addHabitDirectly() { const n = document.getElementById('directNameInput').value, p = parseInt(document.getElementById('directPointInput').value) || 0; if (n) { if(!appData.h[getTodayStr(viewDate)]) appData.h[getTodayStr(viewDate)] = []; appData.h[getTodayStr(viewDate)].push({ n, p, c: false }); save(); updateDisplay(); document.getElementById('directNameInput').value=''; } }
-    function addHabitFromBankSelect() { const n = document.getElementById('habitBankSelect').value, p = parseInt(document.getElementById('bankPointInput').value) || 0; if (n) { if(!appData.h[getTodayStr(viewDate)]) appData.h[getTodayStr(viewDate)] = []; appData.h[getTodayStr(viewDate)].push({ n, p, c: false }); save(); updateDisplay(); } }
-    function syncDateWithBank() { const curStr = getTodayStr(viewDate), curDayIdx = getDayIdx(viewDate); if (!appData.h[curStr]) appData.h[curStr] = []; appData.b.forEach(b => { if (b.days && b.days.includes(curDayIdx) && !appData.h[curStr].some(t => t.n === b.n)) appData.h[curStr].push({ n: b.n, p: b.p, c: false }); }); save(); updateDisplay(); }
-    function toggleCheck(i) { appData.h[getTodayStr(viewDate)][i].c = !appData.h[getTodayStr(viewDate)][i].c; save(); updateDisplay(); }
-    function getCurrWeekDays() { const curr = new Date(); const first = curr.getDate() - (curr.getDay() === 0 ? 6 : curr.getDay() - 1); return [...Array(7).keys()].map(i => new Date(new Date().setDate(first + i)).toISOString().split('T')[0]); }
-    function initSortable() { const el = document.getElementById('habitList'); if(!el || !el.children.length) return; Sortable.create(el, { handle: '.drag-handle', animation: 150, onEnd: function() { const dStr = getTodayStr(viewDate); const newOrder = []; el.querySelectorAll('.habit-item').forEach(item => { newOrder.push(appData.h[dStr][item.getAttribute('data-id')]); }); appData.h[dStr] = newOrder; save(); }}); }
-    function removeHabit(i) { appData.h[getTodayStr(viewDate)].splice(i, 1); save(); updateDisplay(); }
-    function removeFromBank(i) { appData.b.splice(i, 1); save(); updateDisplay(); }
-    function syncBankPoints() { const t = appData.b.find(x => x.n === document.getElementById('habitBankSelect').value); if(t) document.getElementById('bankPointInput').value = t.p; }
-    function changeAppPassword() { if (!checkPermission()) return; const n = prompt("新密碼："); if(n) { appData.pw = n; save(); } }
-    function fullReset() { if(confirm("確定重置？資料將消失！")) { localStorage.clear(); location.reload(); } }
-    function toggleAdmin() { const p = document.getElementById('adminPanel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; }
-    function toggleBankDay(idx, d) { if (!appData.b[idx].days) appData.b[idx].days = []; const f = appData.b[idx].days.indexOf(d); if (f > -1) appData.b[idx].days.splice(f, 1); else appData.b[idx].days.push(d); save(); updateDisplay(); }
-    function redeemPoints() { const c = prompt("扣除點數："); if(c && appData.s.w >= parseInt(c)) { appData.s.w -= parseInt(c); save(); updateDisplay(); } }
+
+    function changeDate(o) { viewDate.setDate(viewDate.getDate() + o); updateDisplay(); }
+    function toggleCheck(i) { appData.h[curD()][i].c = !appData.h[curD()][i].c; commit(); }
+    function removeH(i) { appData.h[curD()].splice(i, 1); commit(); }
+    function removeB(i) { appData.b.splice(i, 1); commit(); }
+    function complete(i) {
+        const d = curD(), x = appData.h[d][i]; appData.s.w += x.p; appData.s.lp = x.p; appData.s.ln = x.n; appData.s.ld = d;
+        if (!appData.l[d]) appData.l[d] = {}; appData.l[d][x.n] = (appData.l[d][x.n] || 0) + 1;
+        appData.h[d][i].c = false; confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } }); commit();
+    }
+    function addFromInput(ni, pi) {
+        const n = document.getElementById(ni).value, p = parseInt(document.getElementById(pi).value) || 0;
+        if (n) { if(!appData.h[curD()]) appData.h[curD()] = []; appData.h[curD()].push({ n, p, c: false }); document.getElementById(ni).value=''; commit(); }
+    }
+    function addNewBankItem() {
+        const n = document.getElementById('newBankName').value, p = parseInt(document.getElementById('newBankPoint').value) || 0;
+        if (n) { appData.b.push({ n, p, days: [0,1,2,3,4,5,6] }); document.getElementById('newBankName').value=''; document.getElementById('newBankPoint').value=''; commit(); }
+    }
+    function editTask(i) { if(!checkPerm()) return; const x = appData.h[curD()][i]; const n = prompt("名稱", x.n); if(n) { appData.h[curD()][i].n = n; appData.h[curD()][i].p = parseInt(prompt("分數", x.p))||0; commit(); } }
+    function editBank(i) { if(!checkPerm()) return; const x = appData.b[i]; const n = prompt("名稱", x.n); if(n) { appData.b[i].n = n; appData.b[i].p = parseInt(prompt("分數", x.p))||0; commit(); } }
+    function toggleBD(i, d) { if(!appData.b[i].days) appData.b[i].days = []; const idx = appData.b[i].days.indexOf(d); if(idx>-1) appData.b[i].days.splice(idx,1); else appData.b[i].days.push(d); commit(); }
+    function syncWithBank() { const d = curD(), di = (viewDate.getDay()+6)%7; if(!appData.h[d]) appData.h[d] = []; appData.b.forEach(b => { if(b.days?.includes(di) && !appData.h[d].some(t => t.n === b.n)) appData.h[d].push({n:b.n, p:b.p, c:false}); }); commit(); }
+    function undo() { if(appData.s.ln && confirm(`撤銷「${appData.s.ln}」加分？`)){ appData.s.w = Math.max(0, appData.s.w - appData.s.lp); if(appData.l[appData.s.ld]?.[appData.s.ln]>0) appData.l[appData.s.ld][appData.s.ln]--; appData.s.ln=""; commit(); } }
+    function fixStar(d, n) { const act = prompt(`${n} 次數`, appData.l[d]?.[n]||0); if(act!==null) { if(!appData.l[d]) appData.l[d]={}; appData.l[d][n]=parseInt(act)||0; commit(); } }
+    function redeem() { const c = prompt("扣除點數"); if(c && appData.s.w >= parseInt(c)) { appData.s.w -= parseInt(c); commit(); } }
+    function exportData() { const n = prompt("存檔名稱", `小超人備份_${curD()}`); if(n) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(appData)], {type:'application/json'})); a.download=`${n}.json`; a.click(); } }
+    function importData() { const i = document.createElement('input'); i.type='file'; i.accept='.json'; i.onchange=e=>{ const r = new FileReader(); r.onload=ev=>{ try{ appData=JSON.parse(ev.target.result); commit(); location.reload(); }catch(e){alert("格式錯誤");} }; r.readAsText(e.target.files[0]); }; i.click(); }
+    function initSortable() {
+        const el = document.getElementById('habitList'); if(!el || !el.children.length) return;
+        if(window.stb) window.stb.destroy();
+        window.stb = Sortable.create(el, { handle:'.drag-handle', animation:200, delay:100, delayOnTouchOnly:true, touchStartThreshold:5, onEnd: () => {
+            const d = curD(), nOrder = []; el.querySelectorAll('.habit-item').forEach(item => nOrder.push(appData.h[d][item.getAttribute('data-id')]));
+            appData.h[d] = nOrder; save(); updateDisplay();
+        }});
+    }
+    function syncBankPoints() { const t = appData.b.find(x => x.n === document.getElementById('bankSelect').value); if(t) document.getElementById('bankPoint').value = t.p; }
+    function changePw() { if(!checkPerm()) return; const n = prompt("新管理密碼"); if(n) { appData.pw = n; commit(); } }
+    function fullReset() { if(confirm("將清除所有紀錄，確定嗎？")) { localStorage.clear(); location.reload(); } }
+    function toggleAdmin() { const p = document.getElementById('adminPanel'); p.style.display = p.style.display==='block'?'none':'block'; }
 
     updateDisplay();
 </script>
